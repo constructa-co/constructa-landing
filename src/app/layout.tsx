@@ -2,8 +2,8 @@ import './globals.css';
 import { Inter } from "next/font/google";
 import type { Metadata } from "next";
 import Script from 'next/script';
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
+// import Header from "@/components/Header";
+// import Footer from "@/components/Footer";
 import { headers } from 'next/headers';
 
 const inter = Inter({ subsets: ["latin"] });
@@ -50,9 +50,9 @@ export default function RootLayout({
         </Script>
       </head>
       <body className={`${inter.className} bg-black text-white antialiased`}>
-        <Header />
+        {/* <Header /> */}
         <main>{children}</main>
-        {!isLandingPage && <Footer />}
+        {/* <Footer /> */}
       </body>
     </html>
   );
