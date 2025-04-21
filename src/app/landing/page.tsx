@@ -145,6 +145,10 @@ export default function LandingPage() {
           });
         `}
       </Script>
+      <Script 
+        src="https://f.convertkit.com/ckjs/ck.5.js"
+        strategy="afterInteractive"
+      />
       
       {/* Hero Section */}
       <section className="relative min-h-screen flex items-center justify-center py-32 md:py-32 px-4 md:px-8">
@@ -160,7 +164,6 @@ export default function LandingPage() {
                   Quote faster, plan smarter, and keep control of every job.
                 </p>
                 <div className="mt-8">
-                  <script src="https://f.convertkit.com/ckjs/ck.5.js"></script>
                   <form 
                     id="waitlist-form"
                     action="https://app.convertkit.com/forms/7919715/subscriptions" 
@@ -173,20 +176,31 @@ export default function LandingPage() {
                     min-width="400 500 600 700 800"
                   >
                     <div data-style="clean">
-                      <div className="flex flex-col sm:flex-row gap-4">
-                        <input 
-                          type="email" 
-                          name="email_address" 
-                          placeholder="Enter your email" 
-                          required 
-                          className="px-6 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-white/40"
-                        />
-                        <button 
-                          type="submit" 
-                          className="px-8 py-3 bg-white text-black rounded-lg font-medium hover:bg-gray-100 transition-colors"
-                        >
-                          Join the waitlist
-                        </button>
+                      <ul data-element="errors" data-group="alert"></ul>
+                      <div data-element="fields" data-stacked="false">
+                        <div className="flex flex-col sm:flex-row gap-4">
+                          <div>
+                            <input 
+                              type="email" 
+                              name="email_address" 
+                              placeholder="Enter your email" 
+                              required 
+                              className="px-6 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-white/40"
+                            />
+                          </div>
+                          <button 
+                            data-element="submit"
+                            type="submit" 
+                            className="px-8 py-3 bg-white text-black rounded-lg font-medium hover:bg-gray-100 transition-colors"
+                          >
+                            <div className="formkit-spinner">
+                              <div></div>
+                              <div></div>
+                              <div></div>
+                            </div>
+                            <span>Join the waitlist</span>
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </form>
