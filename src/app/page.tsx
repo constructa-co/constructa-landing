@@ -13,79 +13,37 @@ declare global {
 
 // ConvertKit form component
 const ConvertKitForm = () => {
-  const [email, setEmail] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitStatus, setSubmitStatus] = useState('');
-
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (!email) return;
+  useEffect(() => {
+    // Create the ConvertKit script exactly as provided
+    const script = document.createElement('script');
+    script.async = true;
+    script.src = 'https://constructa.kit.com/0fbf2928bb/index.js';
+    script.setAttribute('data-uid', '0fbf2928bb');
     
-    setIsSubmitting(true);
-    setSubmitStatus('');
-    
-    try {
-      console.log('Submitting email:', email);
-      
-      // Create form data for submission
-      const formData = new FormData();
-      formData.append('email_address', email);
-      
-      // Submit to ConvertKit public form endpoint
-      const response = await fetch('https://app.convertkit.com/forms/7919715/subscriptions', {
-        method: 'POST',
-        body: formData,
-        headers: {
-          'Accept': 'application/json',
-        },
-      });
-      
-      console.log('Response status:', response.status);
-      
-      if (response.ok) {
-        setSubmitStatus('success');
-        setEmail('');
-        // Track with plausible if available
-        if (window.plausible) window.plausible('WaitlistSignup');
-      } else {
-        setSubmitStatus('error');
-        console.error('Error response:', response);
-      }
-    } catch (error) {
-      console.error('Submission error:', error);
-      setSubmitStatus('error');
-    } finally {
-      setIsSubmitting(false);
+    // Create a container if it doesn't exist
+    let container = document.getElementById('ck-form-container');
+    if (!container) {
+      container = document.createElement('div');
+      container.id = 'ck-form-container';
+      document.getElementById('ck-form-wrapper')?.appendChild(container);
     }
-  };
+    
+    // Append script to the document
+    document.body.appendChild(script);
+    
+    // Cleanup
+    return () => {
+      if (document.body.contains(script)) {
+        document.body.removeChild(script);
+      }
+    };
+  }, []);
 
   return (
     <div className="w-full">
-      <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-4">
-        <input 
-          type="email" 
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="Enter your email" 
-          required 
-          className="px-6 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-white/40"
-        />
-        <button 
-          type="submit" 
-          disabled={isSubmitting}
-          className="px-8 py-3 bg-white text-black rounded-lg font-medium hover:bg-gray-100 transition-colors disabled:opacity-70"
-        >
-          {isSubmitting ? 'Submitting...' : 'Join the waitlist'}
-        </button>
-      </form>
-      
-      {submitStatus === 'success' && (
-        <p className="mt-2 text-green-400 text-sm">Thank you for joining our waitlist!</p>
-      )}
-      
-      {submitStatus === 'error' && (
-        <p className="mt-2 text-red-400 text-sm">Something went wrong. Please try again.</p>
-      )}
+      <div id="ck-form-wrapper">
+        {/* The ConvertKit script will inject the form here */}
+      </div>
     </div>
   );
 };
