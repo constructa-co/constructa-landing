@@ -13,23 +13,13 @@ declare global {
 
 // ConvertKit form component
 const ConvertKitForm = () => {
-  useEffect(() => {
-    // Create script element
-    const script = document.createElement('script');
-    script.src = 'https://constructa.kit.com/0fbf2928bb/index.js';
-    script.async = true;
-    document.body.appendChild(script);
-    
-    return () => {
-      if (document.body.contains(script)) {
-        document.body.removeChild(script);
-      }
-    };
-  }, []);
-
   return (
-    <div id="ck-form-container" className="seva-form formkit-form">
-      {/* The script will inject the form here */}
+    <div className="w-full">
+      <div
+        dangerouslySetInnerHTML={{
+          __html: `<script async data-uid="0fbf2928bb" src="https://constructa.kit.com/0fbf2928bb/index.js"></script>`
+        }}
+      />
     </div>
   );
 };
