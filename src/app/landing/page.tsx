@@ -183,8 +183,44 @@ export default function LandingPage() {
                     data-version="5"
                     min-width="400 500 600 700 800"
                     onSubmit={(e) => {
-                      // Let ConvertKit handle the submission
+                      // Prevent default form submission and handle it manually
+                      e.preventDefault();
+                      
+                      // Log submission attempt for debugging
+                      console.log("Form submission attempted");
+                      
+                      // Get the form data
+                      const formData = new FormData(e.currentTarget);
+                      const email = formData.get('email_address');
+                      console.log("Email being submitted:", email);
+                      
+                      // Analytics tracking
                       if (window.plausible) window.plausible("WaitlistSignup");
+                      
+                      // Manual POST request to ConvertKit
+                      fetch("https://app.convertkit.com/forms/7919715/subscriptions", {
+                        method: "POST",
+                        body: formData,
+                        headers: {
+                          'Accept': 'application/json'
+                        },
+                      })
+                      .then(response => {
+                        console.log("ConvertKit response status:", response.status);
+                        return response.json().catch(() => null);
+                      })
+                      .then(data => {
+                        console.log("ConvertKit response data:", data);
+                        if (data && data.status === "success") {
+                          alert("Thank you for joining our waitlist!");
+                        } else {
+                          alert("Something went wrong. Please try again later.");
+                        }
+                      })
+                      .catch(error => {
+                        console.error("Error submitting to ConvertKit:", error);
+                        alert("Error submitting form. Please try again later.");
+                      });
                     }}
                   >
                     <ul data-element="errors" data-group="alert"></ul>
