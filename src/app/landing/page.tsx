@@ -11,6 +11,53 @@ declare global {
   }
 }
 
+// ConvertKit form component
+const ConvertKitForm = () => {
+  useEffect(() => {
+    // Create script element
+    const script = document.createElement('script');
+    script.src = 'https://f.convertkit.com/ckjs/ck.5.js';
+    script.async = true;
+    document.body.appendChild(script);
+    
+    return () => {
+      document.body.removeChild(script);
+    };
+  }, []);
+
+  return (
+    <form 
+      id="waitlist-form"
+      action="https://app.convertkit.com/forms/7919715/subscriptions" 
+      className="seva-form formkit-form" 
+      method="post" 
+      data-sv-form="7919715" 
+      data-uid="0fbf2928bb" 
+      data-format="inline" 
+      data-version="5"
+      min-width="400 500 600 700 800"
+    >
+      <div data-style="clean">
+        <div className="flex flex-col sm:flex-row gap-4">
+          <input 
+            type="email" 
+            name="email_address" 
+            placeholder="Enter your email" 
+            required 
+            className="px-6 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-white/40"
+          />
+          <button 
+            type="submit" 
+            className="px-8 py-3 bg-white text-black rounded-lg font-medium hover:bg-gray-100 transition-colors"
+          >
+            Join the waitlist
+          </button>
+        </div>
+      </div>
+    </form>
+  );
+};
+
 // Feature section component with sticky scroll
 const FeatureSection = () => {
   const [activeFeature, setActiveFeature] = useState(0);
@@ -167,13 +214,7 @@ export default function LandingPage() {
                   Quote faster, plan smarter, and keep control of every job.
                 </p>
                 <div className="mt-8">
-                  <div id="ck-form-container">
-                    <script
-                      async
-                      data-uid="0fbf2928bb"
-                      src="https://f.convertkit.com/0fbf2928bb/da9a32c85e.js"
-                    ></script>
-                  </div>
+                  <ConvertKitForm />
                 </div>
               </div>
             </div>
