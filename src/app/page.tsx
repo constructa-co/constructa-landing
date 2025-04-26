@@ -70,41 +70,46 @@ const ConvertKitForm = () => {
   };
 
   return (
-    <div>
-      <form 
-        id="waitlist-form"
-        onSubmit={handleSubmit}
-        className="seva-form formkit-form" 
-      >
-        <div className="flex flex-col sm:flex-row gap-4">
-          <input 
-            type="email" 
-            name="email_address" 
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="Enter your email" 
-            required 
-            className="px-6 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-white/40"
-          />
-          <button 
-            type="submit" 
-            disabled={isSubmitting}
-            className="px-8 py-3 bg-white text-black rounded-lg font-medium hover:bg-gray-100 transition-colors disabled:opacity-70"
-          >
-            {isSubmitting ? 'Submitting...' : 'Join the waitlist'}
-          </button>
+    <form 
+      id="waitlist-form"
+      action="https://app.convertkit.com/forms/7919715/subscriptions" 
+      className="seva-form formkit-form" 
+      method="post" 
+      data-sv-form="7919715" 
+      data-uid="0fbf2928bb" 
+      data-format="inline" 
+      data-version="5"
+      min-width="400 500 600 700 800"
+    >
+      <ul data-element="errors" data-group="alert"></ul>
+      <div data-style="clean">
+        <div data-element="fields" data-stacked="false">
+          <div className="flex flex-col sm:flex-row gap-4">
+            <div>
+              <input 
+                type="email" 
+                name="email_address" 
+                placeholder="Enter your email" 
+                required 
+                className="px-6 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-white/40"
+              />
+            </div>
+            <button 
+              data-element="submit"
+              type="submit" 
+              className="px-8 py-3 bg-white text-black rounded-lg font-medium hover:bg-gray-100 transition-colors"
+            >
+              <div className="formkit-spinner">
+                <div></div>
+                <div></div>
+                <div></div>
+              </div>
+              <span>Join the waitlist</span>
+            </button>
+          </div>
         </div>
-      </form>
-      {submitStatus && (
-        <div className="mt-2 text-sm">
-          {submitStatus.includes('Success') ? (
-            <p className="text-green-400">{submitStatus}</p>
-          ) : (
-            <p className="text-red-400">{submitStatus}</p>
-          )}
-        </div>
-      )}
-    </div>
+      </div>
+    </form>
   );
 };
 
