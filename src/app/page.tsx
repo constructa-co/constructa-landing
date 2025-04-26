@@ -152,11 +152,6 @@ export default function LandingPage() {
           });
         `}
       </Script>
-      <Script 
-        src="https://f.convertkit.com/ckjs/ck.5.js"
-        strategy="beforeInteractive"
-        id="convertkit-script"
-      />
       
       {/* Hero Section */}
       <section className="relative min-h-screen flex items-center justify-center py-32 md:py-32 px-4 md:px-8">
@@ -172,6 +167,7 @@ export default function LandingPage() {
                   Quote faster, plan smarter, and keep control of every job.
                 </p>
                 <div className="mt-8">
+                  <script src="https://f.convertkit.com/ckjs/ck.5.js"></script>
                   <form 
                     id="waitlist-form"
                     action="https://app.convertkit.com/forms/7919715/subscriptions" 
@@ -182,46 +178,6 @@ export default function LandingPage() {
                     data-format="inline" 
                     data-version="5"
                     min-width="400 500 600 700 800"
-                    onSubmit={(e) => {
-                      // Prevent default form submission and handle it manually
-                      e.preventDefault();
-                      
-                      // Log submission attempt for debugging
-                      console.log("Form submission attempted");
-                      
-                      // Get the form data
-                      const formData = new FormData(e.currentTarget);
-                      const email = formData.get('email_address');
-                      console.log("Email being submitted:", email);
-                      
-                      // Analytics tracking
-                      if (window.plausible) window.plausible("WaitlistSignup");
-                      
-                      // Manual POST request to ConvertKit
-                      fetch("https://app.convertkit.com/forms/7919715/subscriptions", {
-                        method: "POST",
-                        body: formData,
-                        headers: {
-                          'Accept': 'application/json'
-                        },
-                      })
-                      .then(response => {
-                        console.log("ConvertKit response status:", response.status);
-                        return response.json().catch(() => null);
-                      })
-                      .then(data => {
-                        console.log("ConvertKit response data:", data);
-                        if (data && data.status === "success") {
-                          alert("Thank you for joining our waitlist!");
-                        } else {
-                          alert("Something went wrong. Please try again later.");
-                        }
-                      })
-                      .catch(error => {
-                        console.error("Error submitting to ConvertKit:", error);
-                        alert("Error submitting form. Please try again later.");
-                      });
-                    }}
                   >
                     <div data-style="clean">
                       <div className="flex flex-col sm:flex-row gap-4">
@@ -233,21 +189,13 @@ export default function LandingPage() {
                           className="px-6 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-white/40"
                         />
                         <button 
-                          data-element="submit"
                           type="submit" 
                           className="px-8 py-3 bg-white text-black rounded-lg font-medium hover:bg-gray-100 transition-colors"
                         >
-                          <div className="formkit-spinner">
-                            <div></div>
-                            <div></div>
-                            <div></div>
-                          </div>
-                          <span>Join the waitlist</span>
+                          Join the waitlist
                         </button>
                       </div>
                     </div>
-                    <input type="hidden" name="tags[]" value="waitlist" />
-                    <input type="hidden" name="referrer_url" value={typeof window !== 'undefined' ? window.location.href : ''} />
                   </form>
                 </div>
               </div>
