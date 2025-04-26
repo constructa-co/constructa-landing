@@ -4,6 +4,13 @@ import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Script from 'next/script';
 
+// Add type declaration for plausible
+declare global {
+  interface Window {
+    plausible?: (eventName: string, options?: any) => void;
+  }
+}
+
 // Feature section component with sticky scroll
 const FeatureSection = () => {
   const [activeFeature, setActiveFeature] = useState(0);
@@ -147,7 +154,8 @@ export default function LandingPage() {
       </Script>
       <Script 
         src="https://f.convertkit.com/ckjs/ck.5.js"
-        strategy="afterInteractive"
+        strategy="beforeInteractive"
+        id="convertkit-script"
       />
       
       {/* Hero Section */}
@@ -174,9 +182,13 @@ export default function LandingPage() {
                     data-format="inline" 
                     data-version="5"
                     min-width="400 500 600 700 800"
+                    onSubmit={(e) => {
+                      // Let ConvertKit handle the submission
+                      if (window.plausible) window.plausible("WaitlistSignup");
+                    }}
                   >
+                    <ul data-element="errors" data-group="alert"></ul>
                     <div data-style="clean">
-                      <ul data-element="errors" data-group="alert"></ul>
                       <div data-element="fields" data-stacked="false">
                         <div className="flex flex-col sm:flex-row gap-4">
                           <div>
@@ -203,6 +215,8 @@ export default function LandingPage() {
                         </div>
                       </div>
                     </div>
+                    <input type="hidden" name="tags[]" value="waitlist" />
+                    <input type="hidden" name="referrer_url" value={typeof window !== 'undefined' ? window.location.href : ''} />
                   </form>
                 </div>
               </div>

@@ -4,6 +4,13 @@ import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Script from 'next/script';
 
+// Add type declaration for plausible
+declare global {
+  interface Window {
+    plausible?: (eventName: string, options?: any) => void;
+  }
+}
+
 // Feature section component with sticky scroll
 const FeatureSection = () => {
   const [activeFeature, setActiveFeature] = useState(0);
@@ -145,6 +152,11 @@ export default function LandingPage() {
           });
         `}
       </Script>
+      <Script 
+        src="https://f.convertkit.com/ckjs/ck.5.js"
+        strategy="beforeInteractive"
+        id="convertkit-script"
+      />
       
       {/* Hero Section */}
       <section className="relative min-h-screen flex items-center justify-center py-32 md:py-32 px-4 md:px-8">
@@ -160,7 +172,6 @@ export default function LandingPage() {
                   Quote faster, plan smarter, and keep control of every job.
                 </p>
                 <div className="mt-8">
-                  <script src="https://f.convertkit.com/ckjs/ck.5.js"></script>
                   <form 
                     id="waitlist-form"
                     action="https://app.convertkit.com/forms/7919715/subscriptions" 
@@ -171,6 +182,10 @@ export default function LandingPage() {
                     data-format="inline" 
                     data-version="5"
                     min-width="400 500 600 700 800"
+                    onSubmit={(e) => {
+                      // Let ConvertKit handle the submission
+                      if (window.plausible) window.plausible("WaitlistSignup");
+                    }}
                   >
                     <div data-style="clean">
                       <div className="flex flex-col sm:flex-row gap-4">
@@ -182,13 +197,21 @@ export default function LandingPage() {
                           className="px-6 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-white/40"
                         />
                         <button 
+                          data-element="submit"
                           type="submit" 
                           className="px-8 py-3 bg-white text-black rounded-lg font-medium hover:bg-gray-100 transition-colors"
                         >
-                          Join the waitlist
+                          <div className="formkit-spinner">
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                          </div>
+                          <span>Join the waitlist</span>
                         </button>
                       </div>
                     </div>
+                    <input type="hidden" name="tags[]" value="waitlist" />
+                    <input type="hidden" name="referrer_url" value={typeof window !== 'undefined' ? window.location.href : ''} />
                   </form>
                 </div>
               </div>
