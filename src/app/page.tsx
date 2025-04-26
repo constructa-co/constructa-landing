@@ -19,8 +19,9 @@ const ConvertKitForm = () => {
   // Set up ConvertKit script once
   useEffect(() => {
     const script = document.createElement('script');
-    script.src = 'https://f.convertkit.com/ckjs/ck.5.js';
+    script.src = 'https://constructa.kit.com/0fbf2928bb/index.js';
     script.async = true;
+    script.setAttribute('data-uid', '0fbf2928bb');
     document.body.appendChild(script);
     
     return () => {
@@ -30,23 +31,56 @@ const ConvertKitForm = () => {
     };
   }, []);
 
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!email) return;
+    setIsSubmitted(true);
+    
+    try {
+      // Send to ConvertKit directly
+      const formData = new FormData();
+      formData.append('email', email);
+      
+      await fetch('https://api.convertkit.com/v3/forms/7919715/subscribe', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          api_key: 'V-a7u3e1k-siBu1XmjK-Lg',
+          email: email,
+        }),
+      });
+      
+      // Track with plausible if available
+      if (window.plausible) window.plausible('WaitlistSignup');
+      
+      // Redirect to ConvertKit's success page - this is necessary for their tracking
+      const ckForm = document.createElement('form');
+      ckForm.method = 'POST';
+      ckForm.action = 'https://app.convertkit.com/forms/7919715/subscriptions';
+      ckForm.style.display = 'none';
+      
+      const emailInput = document.createElement('input');
+      emailInput.type = 'email';
+      emailInput.name = 'email_address';
+      emailInput.value = email;
+      
+      ckForm.appendChild(emailInput);
+      document.body.appendChild(ckForm);
+      ckForm.submit();
+      
+    } catch (error) {
+      console.error('Error:', error);
+      setIsSubmitted(false);
+      alert('Something went wrong. Please try again.');
+    }
+  };
+
   return (
-    <div>
+    <div id="waitlist-form">
       {!isSubmitted ? (
-        <form 
-          action="https://app.convertkit.com/forms/7919715/subscriptions" 
-          method="post"
-          className="flex flex-col sm:flex-row gap-4"
-          data-sv-form="7919715" 
-          data-uid="0fbf2928bb" 
-          data-format="inline" 
-          data-version="5"
-          onSubmit={() => {
-            // Track with plausible
-            if (window.plausible) window.plausible('WaitlistSignup');
-            setIsSubmitted(true);
-          }}
-        >
+        <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-4">
           <input 
             type="email" 
             name="email_address" 
@@ -62,10 +96,9 @@ const ConvertKitForm = () => {
           >
             Join the waitlist
           </button>
-          <input type="hidden" name="fields[source]" value="website" />
         </form>
       ) : (
-        <p className="text-green-400">Thank you for joining our waitlist!</p>
+        <p className="text-green-400">Joining waitlist...</p>
       )}
     </div>
   );
