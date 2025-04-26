@@ -31,20 +31,16 @@ const ConvertKitForm = () => {
       const formData = new FormData();
       formData.append('email_address', email);
       
-      // Submit directly to ConvertKit API
-      const response = await fetch('https://api.convertkit.com/v3/forms/7919715/subscribe', {
+      // Submit to ConvertKit public form endpoint
+      const response = await fetch('https://app.convertkit.com/forms/7919715/subscriptions', {
         method: 'POST',
+        body: formData,
         headers: {
-          'Content-Type': 'application/json',
+          'Accept': 'application/json',
         },
-        body: JSON.stringify({
-          api_key: 'V-a7u3e1k-siBu1XmjK-Lg',
-          email: email,
-        }),
       });
       
-      const result = await response.json();
-      console.log('Submission result:', result);
+      console.log('Response status:', response.status);
       
       if (response.ok) {
         setSubmitStatus('success');
@@ -53,7 +49,7 @@ const ConvertKitForm = () => {
         if (window.plausible) window.plausible('WaitlistSignup');
       } else {
         setSubmitStatus('error');
-        console.error('Error response:', result);
+        console.error('Error response:', response);
       }
     } catch (error) {
       console.error('Submission error:', error);
