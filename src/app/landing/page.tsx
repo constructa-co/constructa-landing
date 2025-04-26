@@ -13,6 +13,10 @@ declare global {
 
 // ConvertKit form component
 const ConvertKitForm = () => {
+  const [email, setEmail] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState('');
+
   useEffect(() => {
     // Create script element
     const script = document.createElement('script');
@@ -21,40 +25,86 @@ const ConvertKitForm = () => {
     document.body.appendChild(script);
     
     return () => {
-      document.body.removeChild(script);
+      if (document.body.contains(script)) {
+        document.body.removeChild(script);
+      }
     };
   }, []);
 
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setSubmitStatus('Submitting...');
+    
+    try {
+      console.log('Form submission started with email:', email);
+      
+      const formData = new FormData();
+      formData.append('email_address', email);
+      formData.append('fields[source]', 'website');
+      
+      const response = await fetch('https://app.convertkit.com/forms/7919715/subscriptions', {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'Accept': 'application/json',
+        },
+      });
+      
+      console.log('Response status:', response.status);
+      const data = await response.json().catch(() => null);
+      console.log('Response data:', data);
+      
+      if (response.ok) {
+        setSubmitStatus('Success! Thank you for subscribing.');
+        setEmail('');
+      } else {
+        setSubmitStatus('Something went wrong. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      setSubmitStatus('Error submitting form. Please try again later.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
-    <form 
-      id="waitlist-form"
-      action="https://app.convertkit.com/forms/7919715/subscriptions" 
-      className="seva-form formkit-form" 
-      method="post" 
-      data-sv-form="7919715" 
-      data-uid="0fbf2928bb" 
-      data-format="inline" 
-      data-version="5"
-      min-width="400 500 600 700 800"
-    >
-      <div data-style="clean">
+    <div>
+      <form 
+        id="waitlist-form"
+        onSubmit={handleSubmit}
+        className="seva-form formkit-form" 
+      >
         <div className="flex flex-col sm:flex-row gap-4">
           <input 
             type="email" 
             name="email_address" 
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             placeholder="Enter your email" 
             required 
             className="px-6 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-white/40"
           />
           <button 
             type="submit" 
-            className="px-8 py-3 bg-white text-black rounded-lg font-medium hover:bg-gray-100 transition-colors"
+            disabled={isSubmitting}
+            className="px-8 py-3 bg-white text-black rounded-lg font-medium hover:bg-gray-100 transition-colors disabled:opacity-70"
           >
-            Join the waitlist
+            {isSubmitting ? 'Submitting...' : 'Join the waitlist'}
           </button>
         </div>
-      </div>
-    </form>
+      </form>
+      {submitStatus && (
+        <div className="mt-2 text-sm">
+          {submitStatus.includes('Success') ? (
+            <p className="text-green-400">{submitStatus}</p>
+          ) : (
+            <p className="text-red-400">{submitStatus}</p>
+          )}
+        </div>
+      )}
+    </div>
   );
 };
 
