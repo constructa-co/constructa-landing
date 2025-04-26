@@ -13,25 +13,16 @@ declare global {
 
 // ConvertKit form component
 const ConvertKitForm = () => {
+  const [email, setEmail] = useState('');
+  const [isSubmitted, setIsSubmitted] = useState(false);
+
+  // Set up ConvertKit script once
   useEffect(() => {
-    // Create the ConvertKit script exactly as provided
     const script = document.createElement('script');
+    script.src = 'https://f.convertkit.com/ckjs/ck.5.js';
     script.async = true;
-    script.src = 'https://constructa.kit.com/0fbf2928bb/index.js';
-    script.setAttribute('data-uid', '0fbf2928bb');
-    
-    // Create a container if it doesn't exist
-    let container = document.getElementById('ck-form-container');
-    if (!container) {
-      container = document.createElement('div');
-      container.id = 'ck-form-container';
-      document.getElementById('ck-form-wrapper')?.appendChild(container);
-    }
-    
-    // Append script to the document
     document.body.appendChild(script);
     
-    // Cleanup
     return () => {
       if (document.body.contains(script)) {
         document.body.removeChild(script);
@@ -40,10 +31,42 @@ const ConvertKitForm = () => {
   }, []);
 
   return (
-    <div className="w-full">
-      <div id="ck-form-wrapper">
-        {/* The ConvertKit script will inject the form here */}
-      </div>
+    <div>
+      {!isSubmitted ? (
+        <form 
+          action="https://app.convertkit.com/forms/7919715/subscriptions" 
+          method="post"
+          className="flex flex-col sm:flex-row gap-4"
+          data-sv-form="7919715" 
+          data-uid="0fbf2928bb" 
+          data-format="inline" 
+          data-version="5"
+          onSubmit={() => {
+            // Track with plausible
+            if (window.plausible) window.plausible('WaitlistSignup');
+            setIsSubmitted(true);
+          }}
+        >
+          <input 
+            type="email" 
+            name="email_address" 
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="Enter your email" 
+            required 
+            className="px-6 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-white/40"
+          />
+          <button 
+            type="submit" 
+            className="px-8 py-3 bg-white text-black rounded-lg font-medium hover:bg-gray-100 transition-colors"
+          >
+            Join the waitlist
+          </button>
+          <input type="hidden" name="fields[source]" value="website" />
+        </form>
+      ) : (
+        <p className="text-green-400">Thank you for joining our waitlist!</p>
+      )}
     </div>
   );
 };
