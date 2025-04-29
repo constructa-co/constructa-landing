@@ -34,10 +34,33 @@ const ConvertKitForm = () => {
     const script = document.createElement('script');
     script.src = 'https://f.convertkit.com/ckjs/ck.5.js';
     script.async = true;
+    script.setAttribute('data-uid', '0fbf2928bb');
+    script.setAttribute('data-embed-version', '5');
+    
+    // Add a mutation observer to remove any auto-injected forms
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        mutation.addedNodes.forEach((node) => {
+          if (node instanceof HTMLElement) {
+            // Check if this is an auto-injected ConvertKit form in the footer
+            if (node.classList.contains('formkit-form') && 
+                !node.closest('#waitlist-form') && // Not our custom form
+                node.closest('footer')) {
+              node.remove();
+            }
+          }
+        });
+      });
+    });
+
+    // Start observing the document with the configured parameters
+    observer.observe(document.body, { childList: true, subtree: true });
+
     document.body.appendChild(script);
     
     return () => {
       document.body.removeChild(script);
+      observer.disconnect();
     };
   }, []);
 
