@@ -20,37 +20,49 @@ const ConvertKitForm = () => {
     script.async = true;
     document.body.appendChild(script);
     
-    // Set up form submission handler
-    const form = document.getElementById('waitlist-form');
-    if (form) {
-      form.addEventListener('submit', (e) => {
-        e.preventDefault();
+    script.onload = () => {
+      // Set up form submission handler after ConvertKit script loads
+      const form = document.getElementById('waitlist-form');
+      if (form) {
+        // Remove the default form action to prevent redirect
+        form.removeAttribute('action');
         
-        // Get the form data
-        const formData = new FormData(form as HTMLFormElement);
-        
-        // Submit to ConvertKit using their API
-        const formKit = (window as any).FormKit;
-        if (formKit) {
-          formKit.submit(form as HTMLFormElement, {
-            onSuccess: () => {
-              // Track with Plausible if available
-              if (window.plausible) window.plausible('WaitlistSignup');
-              
-              // Redirect to main page
-              window.location.href = '/';
-            },
-            onError: (error: any) => {
-              console.error('Error submitting form:', error);
-              alert('Something went wrong. Please try again.');
+        form.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          
+          // Get the form data
+          const formData = new FormData(form as HTMLFormElement);
+          const email = formData.get('email_address');
+          
+          try {
+            // Submit to ConvertKit API directly
+            const response = await fetch('https://api.convertkit.com/v3/forms/7919715/subscribe', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                api_key: 'V-a7u3e1k-siBu1XmjK-Lg',
+                email: email,
+              }),
+            });
+
+            if (!response.ok) {
+              throw new Error('Subscription failed');
             }
-          });
-        } else {
-          console.error('ConvertKit FormKit not loaded');
-          alert('Something went wrong. Please try again.');
-        }
-      });
-    }
+
+            // Track with Plausible if available
+            if (window.plausible) window.plausible('WaitlistSignup');
+            
+            // Redirect to main page
+            window.location.href = '/';
+          } catch (error) {
+            console.error('Error submitting form:', error);
+            alert('Something went wrong. Please try again.');
+          }
+        });
+      }
+    };
     
     return () => {
       document.body.removeChild(script);
@@ -60,7 +72,6 @@ const ConvertKitForm = () => {
   return (
     <form 
       id="waitlist-form"
-      action="https://app.convertkit.com/forms/7919715/subscriptions" 
       className="seva-form formkit-form" 
       method="post" 
       data-sv-form="7919715" 
