@@ -14,55 +14,27 @@ declare global {
 // ConvertKit form component
 const ConvertKitForm = () => {
   useEffect(() => {
+    // Add window.formkit configuration before loading the script
+    (window as any).formkit = {
+      configure: {
+        submitRedirect: false, // Prevent default redirect
+        submitText: "Join the waitlist", // Keep original button text
+        format: "inline",
+        submitSuccess: () => {
+          // Track with Plausible if available
+          if (window.plausible) window.plausible('WaitlistSignup');
+          // Redirect to main page
+          window.location.href = '/';
+          return false; // Prevent default success behavior
+        }
+      }
+    };
+
     // Create script element
     const script = document.createElement('script');
     script.src = 'https://f.convertkit.com/ckjs/ck.5.js';
     script.async = true;
     document.body.appendChild(script);
-    
-    script.onload = () => {
-      // Set up form submission handler after ConvertKit script loads
-      const form = document.getElementById('waitlist-form');
-      if (form) {
-        // Remove the default form action to prevent redirect
-        form.removeAttribute('action');
-        
-        form.addEventListener('submit', async (e) => {
-          e.preventDefault();
-          
-          // Get the form data
-          const formData = new FormData(form as HTMLFormElement);
-          const email = formData.get('email_address');
-          
-          try {
-            // Submit to ConvertKit API directly
-            const response = await fetch('https://api.convertkit.com/v3/forms/7919715/subscribe', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({
-                api_key: 'V-a7u3e1k-siBu1XmjK-Lg',
-                email: email,
-              }),
-            });
-
-            if (!response.ok) {
-              throw new Error('Subscription failed');
-            }
-
-            // Track with Plausible if available
-            if (window.plausible) window.plausible('WaitlistSignup');
-            
-            // Redirect to main page
-            window.location.href = '/';
-          } catch (error) {
-            console.error('Error submitting form:', error);
-            alert('Something went wrong. Please try again.');
-          }
-        });
-      }
-    };
     
     return () => {
       document.body.removeChild(script);
@@ -72,6 +44,7 @@ const ConvertKitForm = () => {
   return (
     <form 
       id="waitlist-form"
+      action="https://app.convertkit.com/forms/7919715/subscriptions" 
       className="seva-form formkit-form" 
       method="post" 
       data-sv-form="7919715" 
