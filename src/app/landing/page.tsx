@@ -20,6 +20,38 @@ const ConvertKitForm = () => {
     script.async = true;
     document.body.appendChild(script);
     
+    // Set up form submission handler
+    const form = document.getElementById('waitlist-form');
+    if (form) {
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        
+        // Get the form data
+        const formData = new FormData(form as HTMLFormElement);
+        
+        // Submit to ConvertKit using their API
+        const formKit = (window as any).FormKit;
+        if (formKit) {
+          formKit.submit(form as HTMLFormElement, {
+            onSuccess: () => {
+              // Track with Plausible if available
+              if (window.plausible) window.plausible('WaitlistSignup');
+              
+              // Redirect to main page
+              window.location.href = '/';
+            },
+            onError: (error: any) => {
+              console.error('Error submitting form:', error);
+              alert('Something went wrong. Please try again.');
+            }
+          });
+        } else {
+          console.error('ConvertKit FormKit not loaded');
+          alert('Something went wrong. Please try again.');
+        }
+      });
+    }
+    
     return () => {
       document.body.removeChild(script);
     };
