@@ -20,6 +20,13 @@ const ConvertKitForm = () => {
         submitRedirect: false, // Prevent default redirect
         submitText: "Join the waitlist", // Keep original button text
         format: "inline",
+        renderForm: false, // Prevent auto-rendering
+        content: false, // Disable default content
+        embed: {
+          manual: true, // Only load forms when explicitly called
+          autoEmbed: false, // Disable auto-embedding
+          removeAutoEmbed: true // Remove any auto-embedded forms
+        },
         submitSuccess: () => {
           // Track with Plausible if available
           if (window.plausible) window.plausible('WaitlistSignup');
@@ -37,30 +44,52 @@ const ConvertKitForm = () => {
     script.setAttribute('data-uid', '0fbf2928bb');
     script.setAttribute('data-embed-version', '5');
     
+    // Function to remove any auto-injected forms
+    const removeAutoInjectedForms = () => {
+      const forms = document.querySelectorAll('form.formkit-form:not(#waitlist-form), form[data-sv-form]:not(#waitlist-form), .seva-form:not(#waitlist-form)');
+      forms.forEach(form => {
+        if (form.parentElement) {
+          form.parentElement.remove();
+        }
+      });
+    };
+
     // Add a mutation observer to remove any auto-injected forms
     const observer = new MutationObserver((mutations) => {
       mutations.forEach((mutation) => {
         mutation.addedNodes.forEach((node) => {
           if (node instanceof HTMLElement) {
-            // Check if this is an auto-injected ConvertKit form in the footer
-            if (node.classList.contains('formkit-form') && 
-                !node.closest('#waitlist-form') && // Not our custom form
-                node.closest('footer')) {
+            // Check if this is an auto-injected ConvertKit form
+            if ((node.classList.contains('formkit-form') || 
+                node.hasAttribute('data-sv-form') ||
+                node.classList.contains('seva-form')) &&
+                node.id !== 'waitlist-form') {
               node.remove();
             }
           }
         });
       });
+      removeAutoInjectedForms();
     });
 
     // Start observing the document with the configured parameters
-    observer.observe(document.body, { childList: true, subtree: true });
+    observer.observe(document.body, { 
+      childList: true, 
+      subtree: true,
+      attributes: true,
+      characterData: true
+    });
+
+    // Initial cleanup
+    removeAutoInjectedForms();
 
     document.body.appendChild(script);
     
+    // Cleanup on unmount
     return () => {
       document.body.removeChild(script);
       observer.disconnect();
+      removeAutoInjectedForms();
     };
   }, []);
 

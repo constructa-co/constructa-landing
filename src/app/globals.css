@@ -192,6 +192,15 @@ html {
   }
 
   /* Hide auto-injected ConvertKit form */
-  footer .formkit-form:not(#waitlist-form) {
+  footer .formkit-form:not(#waitlist-form),
+  footer form[data-sv-form],
+  footer .seva-form,
+  footer [data-format="inline"] {
     display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    height: 0 !important;
+    width: 0 !important;
+    position: absolute !important;
+    pointer-events: none !important;
   }
